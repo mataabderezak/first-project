@@ -1,38 +1,41 @@
-// src/AddCategory.js
-import React, { useState } from 'react';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchCategories } from '../redux/categories/categoryAction';
+
+
 
 const AddCategory = () => {
-  const [categoryName, setCategoryName] = useState('');
+  const categoriesData = useSelector(state=> state.categories)
+  const isLoading = useSelector(state=> state.loading)
+  const dispatch = useDispatch();  
 
-  const handleInputChange = (e) => {
-    setCategoryName(e.target.value);
-  };
+ useEffect ( () => {
+  dispatch(fetchCategories())
+ },[]);
 
-  const handleAddCategory = () => {
-    // Ajoutez ici la logique pour traiter l'ajout de la catégorie
-    alert(`Category "${categoryName}" added!`);
-    setCategoryName(''); // Efface le champ après ajout
-  };
+
+ 
+  console.log(categoriesData);
 
   return (
-    <div className="container">
-      <h2>Add Category</h2>
-      <div className="mb-3">
-        <label htmlFor="categoryName" className="form-label">
-          Category Name
-        </label>
-        <input
-          type="text"
-          className="form-control"
-          id="categoryName"
-          value={categoryName}
-          onChange={handleInputChange}
-        />
-      </div>
-      <button className="btn btn-primary" onClick={handleAddCategory}>
-        Add Category
-      </button>
-    </div>
+    <>
+      <h2>Categories</h2>
+      {isLoading ? (
+        <div className="text-center mt-5">
+          <div className="spinner-border" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p>Loading...</p>
+        </div>
+      ) : (
+        <ul>
+          {categoriesData.categories.map(category => (
+            <li>{category.name}</li>
+          ))}
+        </ul>
+      )}
+    </>
   );
 };
 

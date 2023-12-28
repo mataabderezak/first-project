@@ -4,8 +4,8 @@ import DetailsProduct from './pages/DetailsProduct';
 import AddCategory from './pages/AddCategory';
 import 'bootstrap/dist/css/bootstrap.min.css'
 
+
 function App() {
-  
   return (
    <>
  <nav className="navbar navbar-expand-lg navbar-light bg-light">

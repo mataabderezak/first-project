@@ -1,37 +1,35 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
+import { createContext } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { withRouter } from 'react-router';
+import { fetchProducts, setSelectedProduct, setSelectedProductAndNavigate } from '../redux/products/productAction';
+import { useNavigate } from 'react-router-dom';
+
+const myContext = createContext();
+
 
 const Products = () => {
-    const [productListAll, setProductList] = useState([]);
-    const [isLoading, setisLoading] = useState(true);
+  const productsData = useSelector(state=> state.products)
+  const isLoading = useSelector(state=> state.loading)
+  const dispatch = useDispatch();  
+  const navigate = useNavigate(); 
+  const selectedProduct = useSelector(state=> state.selectedProduct)
 
-    useEffect(() => {
-        const fetchProducts = async () => {
-          try {
-            const apiUrl = 'https://www.bahmedkamel.com/wp-json/wc/v3/products';
-            const apiToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MDM1OTY5OTAsImV4cCI6MTcwMzYwMDU5MCwiZW1haWwiOiJhZG1pbkBiYWhtZWRrYW1lbC5jb20iLCJpZCI6IjEiLCJzaXRlIjoiaHR0cHM6XC9cL3d3dy5iYWhtZWRrYW1lbC5jb20iLCJ1c2VybmFtZSI6ImFkbWluIiwiaXNzIjoiaHR0cHM6XC9cL3d3dy5iYWhtZWRrYW1lbC5jb20ifQ.CBpawJPJf4IaxPhbdrzH9CvBg-Om6Tpu1QXA-duACiA';
-    
-            const response = await axios.get(apiUrl, {
-              headers: {
-                Authorization: `Bearer ${apiToken}`,
-              },
-            });
-    
-            setProductList(response.data);
-            setisLoading(false);
+ useEffect ( () => {
+  dispatch(fetchProducts())
+ },[]);
 
-          } catch (error) {
-            console.error('Une erreur s\'est produite lors de la récupération des produits :', error);
-            setisLoading(false);
-        }
-        };
-    
-        fetchProducts();
-      }, []); // Le tableau vide [] assure que cet effet est exécuté une seule fois lors du montage
-    
-  
+ const handleProductClick = (product) => {
+  dispatch(setSelectedProductAndNavigate(dispatch(setSelectedProduct(product)),navigate));
+
+};
+
+ 
+  console.log(productsData);
+
     return (
-        <div className="container">
+       <div className="container">
         <h2>Products</h2>
         {
             isLoading? (<div className="text-center mt-5">
@@ -40,9 +38,8 @@ const Products = () => {
             </div>
             <p>Loading...</p>
           </div>) : (
-        
         <div className="row">
-          {productListAll.map(product => (
+          {productsData.products.map(product => (
             <div key={product.id} className="col-md-2 mb-4">
               <div className="card">
                 <img
@@ -54,8 +51,13 @@ const Products = () => {
                   <h5 className="card-title">{product.name}</h5>
                   <p className="card-text">Description</p>
                   <p className="card-text">Price: ${product.price}</p>
-                  {/* Ajoutez d'autres détails du produit ici */}
                 </div>
+                <div className="card-body">
+          <a  onClick={() => handleProductClick(product)} className="btn btn-primary">
+            View Details
+          
+          </a>
+        </div>
               </div>
             </div>
           ))}
@@ -63,7 +65,9 @@ const Products = () => {
             )
         }
       </div>
+      
     );
+    
   }
   
 export default Products
